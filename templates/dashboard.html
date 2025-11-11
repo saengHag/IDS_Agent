@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>IDS-agent 보고서</title>
+</head>
+<body>
+  <h1>IDS-agent 요약 보고서</h1>
+  <p><b>공격 유형:</b> {{ report.predicted_attack }}</p>
+  <p><b>신뢰도:</b> {{ report.confidence }}</p>
+  <p><b>관련 MITRE:</b> {{ report.related_mitre }}</p>
+  <p><b>관련 CVE:</b> {{ report.related_cve }}</p>
+  <h3>요약</h3>
+  <p>{{ report.summary }}</p>
+  <h3>권장 조치</h3>
+  <ul>
+  {% for act in report.recommended_action %}
+    <li>{{ act }}</li>
+  {% endfor %}
+  </ul>
+</body>
+</html>
