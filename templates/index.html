@@ -2,13 +2,27 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>IDS-agent</title>
+  <title>IDS-agent 이벤트 분석</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #fafafa; }
+    .container { max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #333; }
+    input[type=file] { display: block; margin: 20px auto; }
+    button { display: block; margin: 20px auto; padding: 10px 30px; font-size: 16px; cursor: pointer; }
+    .error { color: red; text-align: center; }
+  </style>
 </head>
 <body>
-  <h1>IDS-agent 이벤트 분석</h1>
-  <form action="/analyze" method="post">
-    <textarea name="event" rows="6" cols="80" placeholder="Snort 로그 입력..."></textarea><br>
-    <button type="submit">분석 실행</button>
-  </form>
+  <div class="container">
+    <h1>Snort 이벤트 로그 분석</h1>
+    <form method="POST" enctype="multipart/form-data">
+      <input type="file" name="snort_log" accept=".log,.txt">
+      <button type="submit">분석 실행</button>
+    </form>
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+  </div>
 </body>
 </html>

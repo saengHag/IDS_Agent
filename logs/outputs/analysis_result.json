@@ -1,0 +1,14 @@
+{
+    "summary": "Detected Port Scan with confidence 0.92.",
+    "recommendation": "Isolate affected hosts and block suspicious IPs.",
+    "references": [
+        {
+            "title": "CVE-2024-xxxx",
+            "summary": "Port scanning vulnerability..."
+        },
+        {
+            "title": "ATT&CK T1046",
+            "summary": "Network service scanning behavior."
+        }
+    ]
+}

@@ -1,44 +1,47 @@
-# log_listener.py
-import time, json, requests
-from pathlib import Path
-from config import SNORT_LOG_PATH
+# snort 로그 자동 감시. snort 폴더 내에 파일 생성되면 watchdog으로 탐지함
+import time
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+from agent_core import AgentCore
+from utils.logger import log_event
+from utils.json_handler import save_json
+import os
 
-API_URL = "http://127.0.0.1:5000/analyze"
-LAST_POS_FILE = Path("logs/last_pos.txt")
+LOG_DIR = "./logs/snort"
+OUTPUT_DIR = "./logs/outputs"
 
-def read_new_lines(file_path: Path, last_pos: int):
-    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-        f.seek(last_pos)
-        new_data = f.read()
-        new_pos = f.tell()
-    return new_data, new_pos
+class SnortLogHandler(FileSystemEventHandler):
+    def __init__(self):
+        super().__init__()
+        self.agent = AgentCore()
 
-def main():
-    SNORT_LOG_PATH.parent.mkdir(exist_ok=True)
-    if not SNORT_LOG_PATH.exists():
-        print("[WAIT] Snort 로그 파일을 기다리는 중...")
-        while not SNORT_LOG_PATH.exists():
-            time.sleep(2)
+    def on_modified(self, event):
+        if not event.is_directory and event.src_path.endswith(".log"):
+            log_event(f"Snort 로그 변경 감지: {event.src_path}")
+            with open(event.src_path, "r", encoding="utf-8", errors="ignore") as f:
+                lines = f.readlines()
+                if lines:
+                    # 가장 최근 로그 1줄만 분석 (필요시 다중 처리 가능)
+                    latest = lines[-1]
+                    result = self.agent.process_log(latest)
+                    os.makedirs(OUTPUT_DIR, exist_ok=True)
+                    save_json(result, os.path.join(OUTPUT_DIR, "auto_analysis.json"))
+                    log_event("자동 분석 완료 및 저장됨.")
 
-    last_pos = 0
-    if LAST_POS_FILE.exists():
-        last_pos = int(LAST_POS_FILE.read_text())
+def start_listener():
+    os.makedirs(LOG_DIR, exist_ok=True)
+    observer = Observer()
+    handler = SnortLogHandler()
+    observer.schedule(handler, path=LOG_DIR, recursive=False)
+    observer.start()
+    log_event("Snort 로그 자동 감시 시작됨.")
 
-    print(f"[START] Snort 로그 감시 시작: {SNORT_LOG_PATH}")
-
-    while True:
-        new_data, new_pos = read_new_lines(SNORT_LOG_PATH, last_pos)
-        if new_data.strip():
-            for line in new_data.strip().splitlines():
-                try:
-                    payload = {"event": line}
-                    requests.post(API_URL, json=payload, timeout=10)
-                    print(f"[+] 신규 이벤트 전송 완료: {line[:80]}...")
-                except Exception as e:
-                    print(f"[!] 전송 실패: {e}")
-        last_pos = new_pos
-        LAST_POS_FILE.write_text(str(last_pos))
-        time.sleep(2)
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
 
 if __name__ == "__main__":
-    main()
+    start_listener()
