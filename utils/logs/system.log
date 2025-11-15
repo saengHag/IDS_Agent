@@ -18,3 +18,13 @@
 [2025-11-14 21:43:37] IDS-Agent Flask 서버 시작됨
 [2025-11-14 21:43:41] IDS-Agent Flask 서버 시작됨
 [2025-11-14 21:43:42] IDS-Agent Flask 서버 시작됨
+[2025-11-15 16:52:15] RAG Query Received
+[2025-11-15 16:52:16] Embedding error
+[2025-11-15 16:52:16] Summarization error
+[2025-11-15 16:52:16] RAG Query Completed
+[2025-11-15 17:00:17] RAG Query Received
+[2025-11-15 17:00:18] Embedding error
+[2025-11-15 17:00:18] Summarization error
+[2025-11-15 17:00:18] RAG Query Completed
+[2025-11-15 17:07:41] RAG Query Received
+[2025-11-15 17:07:52] RAG Query Completed
