@@ -1,4 +1,4 @@
-# snort 로그 자동 감시. snort 폴더 내에 파일 생성되면 watchdog으로 탐지함
+# snort 로그 자동 감시. snort 폴더 내에 파일 생성되면 watchdog으로 탐지함. 이제 안 씀
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler

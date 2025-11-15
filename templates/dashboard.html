@@ -1,52 +1,25 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>분석 결과 - IDS-agent</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f4; }
-    .container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
-    h1 { text-align: center; color: #2c3e50; }
-    .section { margin-bottom: 20px; }
-    .label { font-weight: bold; color: #555; }
-    .value { margin-left: 10px; color: #333; }
-    .references { margin-top: 20px; background: #f8f8f8; padding: 15px; border-radius: 8px; }
-    .btn { display: block; text-align: center; margin-top: 30px; }
-    .btn a { background: #3498db; color: white; padding: 10px 25px; border-radius: 6px; text-decoration: none; }
-    .btn a:hover { background: #2980b9; }
-  </style>
+  <meta charset="UTF-8" />
+  <title>IDS-Agent 실시간 대시보드</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>이벤트 분석 결과</h1>
+  <h2>이벤트 분석 결과</h2>
+  <p><b>탐지된 공격 유형:</b> <span id="attack_type">{{ report.attack_type }}</span></p>
+  <p><b>신뢰도:</b> <span id="confidence">{{ report.confidence }}</span></p>
+  <p><b>권장 대응 조치:</b> <span id="recommendation">{{ report.recommendation }}</span></p>
 
-    <div class="section">
-      <span class="label">탐지된 공격 유형:</span>
-      <span class="value">{{ report.attack_type }}</span>
-    </div>
-
-    <div class="section">
-      <span class="label">신뢰도(Confidence):</span>
-      <span class="value">{{ report.confidence }}</span>
-    </div>
-
-    <div class="section">
-      <span class="label">권장 대응 조치:</span>
-      <p>{{ report.recommendation }}</p>
-    </div>
-
-    <div class="section references">
-      <h3>참조 문서</h3>
-      <ul>
-        {% for ref in report.references %}
-        <li><strong>{{ ref.title }}</strong> — {{ ref.summary }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="btn">
-      <a href="/">← 다시 분석하기</a>
-    </div>
-  </div>
+  <script>
+    const socket = io();
+    socket.on("new_report", (data) => {
+      console.log("새 분석 결과 수신됨:", data);
+      document.getElementById("attack_type").textContent = data.attack_type;
+      document.getElementById("confidence").textContent = data.confidence;
+      document.getElementById("recommendation").textContent = data.recommendation;
+      alert("새 Snort 로그 이벤트가 감지되었습니다!");
+    });
+  </script>
 </body>
 </html>

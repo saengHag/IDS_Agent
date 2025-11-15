@@ -1,12 +1,20 @@
-class LLMAgent:
-    def __init__(self, model_name="gpt-4o-mini"):
-        self.model_name = model_name
-        # TODO: LLM API 키 또는 로컬 모델 연결 설정
+import joblib
+import os
 
-    def summarize(self, ml_result: dict, rag_data: list) -> dict:
-        # TODO: RAG + ML 결과를 기반으로 리포트 생성
-        return {
-            "summary": f"Detected {ml_result['attack_type']} with confidence {ml_result['confidence']}.",
-            "recommendation": "Isolate affected hosts and block suspicious IPs.",
-            "references": rag_data
-        }
+class IDSAgent:
+    def __init__(self):
+        model_path = r"C:/Users/dlgkr/aisecurity/models/saved_models/kisti_rf_model_retrained.pkl"
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"[!] 학습된 모델을 찾을 수 없습니다: {model_path}")
+        print(f"[+] IDS 모델 로드 완료: {model_path}")
+        self.model = joblib.load(model_path)
+
+    def process_log(self, log_file):
+        # Snort 로그를 구조화한 뒤, ML 모델로 예측
+        data = self.parse_snort_log(log_file)
+        predictions = self.model.predict(data)
+        return {"result": predictions.tolist()}
+    
+    def parse_snort_log(self, log_file):
+        # Snort 로그를 feature vector로 변환하는 로직 작성
+        pass
